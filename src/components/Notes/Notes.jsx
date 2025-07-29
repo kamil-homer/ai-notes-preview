@@ -5,6 +5,7 @@ import {
   Input,
   InputAdornment,
   InputLabel,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { Tiptap } from "../Tiptap/Tiptap";
@@ -18,17 +19,20 @@ import "./notes.css";
 import { useShallow } from "zustand/react/shallow";
 import { useEffect, useState } from "react";
 import { ai } from "../../services/ai-studio-client";
+import { generateTitlePrompt } from "../../prompts/prompts";
 
 export const Notes = () => {
   const { id } = useParams();
   const [isGeneratingAiContent, setIsGeneratingAiContent] = useState(false);
-  const { notes, currentNoteTitle, setCurrentNoteTitle } = useNotesState(
-    useShallow((state) => ({
-      notes: state.notes,
-      currentNoteTitle: state.currentNoteTitle,
-      setCurrentNoteTitle: state.setCurrentNoteTitle,
-    }))
-  );
+  const { notes, currentNoteTitle, setCurrentNoteTitle, currentNotePlainText } =
+    useNotesState(
+      useShallow((state) => ({
+        notes: state.notes,
+        currentNoteTitle: state.currentNoteTitle,
+        setCurrentNoteTitle: state.setCurrentNoteTitle,
+        currentNotePlainText: state.currentNotePlainText,
+      }))
+    );
 
   const selectedNote = id ? notes.find((note) => note.id == id) : null;
   useEffect(() => {
@@ -39,22 +43,23 @@ export const Notes = () => {
   }, [selectedNote]);
 
   const handleAiTitle = async () => {
-    console.log("calling ai");
     setIsGeneratingAiContent(true);
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `Napisz mi tytuł dla następującego posta: 'To jest mój post o React i o jego nauce'.
-        Maksymalnie 3 wyrazy.
-        Przykłady dobrych tematów: "Notatki ze spotkania", "Lista zakupów", "Ksiązki i blogi"`,
-      config: {
-        thinkingConfig: {
-          thinkingBudget: 0, // Disables thinking
+    let response;
+    try {
+      response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: generateTitlePrompt(currentNotePlainText),
+        config: {
+          thinkingConfig: {
+            thinkingBudget: 0, // Disables thinking
+          },
         },
-      },
-    });
+      });
+      setCurrentNoteTitle(response.text);
+    } catch (error) {
+      console.log("Error generating AI title:", error);
+    }
     setIsGeneratingAiContent(false);
-    console.log(response);
-    setCurrentNoteTitle(response.text);
   };
 
   const modificationDate = selectedNote
@@ -83,12 +88,15 @@ export const Notes = () => {
           onChange={(e) => setCurrentNoteTitle(e.target.value)}
           startAdornment={
             <InputAdornment position="start">
-              <IconButton
-                onClick={handleAiTitle}
-                loading={isGeneratingAiContent}
-              >
-                <AutoAwesomeIcon />
-              </IconButton>
+              <Tooltip title="Wygeneruj tytuł przez AI">
+                <IconButton
+                  onClick={handleAiTitle}
+                  loading={isGeneratingAiContent}
+                  disabled={false}
+                >
+                  <AutoAwesomeIcon />
+                </IconButton>
+              </Tooltip>
             </InputAdornment>
           }
         />

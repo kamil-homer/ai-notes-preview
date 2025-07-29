@@ -1,4 +1,4 @@
-import { Box, Button, IconButton } from "@mui/material";
+import { Box, Button, IconButton, Tooltip } from "@mui/material";
 import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNotesState } from "../../store/notes-state";
@@ -6,23 +6,8 @@ import { supabase } from "../../services/supabase-client";
 import { memo, useState } from "react";
 import { useParams } from "react-router";
 import { useShallow } from "zustand/react/shallow";
-
-const tags = [
-  "React",
-  "JavaScript",
-  "NodeJS",
-  "TypeScript",
-  "HTML",
-  "CSS",
-  "Redux",
-  "GraphQL",
-  "NextJS",
-];
-
-const getRandomTag = (tags) => {
-  const index = Math.floor(Math.random() * tags.length);
-  return tags[index];
-};
+import { ai } from "../../services/ai-studio-client";
+import { generateTagPrompt } from "../../prompts/prompts";
 
 const NoteButtonsComponent = () => {
   const { id } = useParams();
@@ -49,8 +34,21 @@ const NoteButtonsComponent = () => {
 
   const handleSave = async () => {
     setIsSaving(true);
-    // generate by AI
-    const noteTag = getRandomTag(tags);
+    let noteTag = "";
+    try {
+      const noteTagResponse = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: generateTagPrompt(currentNotePlainText),
+        config: {
+          thinkingConfig: {
+            thinkingBudget: 0, // Disables thinking
+          },
+        },
+      });
+      noteTag = noteTagResponse.text;
+    } catch (error) {
+      console.log("Error generating AI title:", error);
+    }
 
     const newEntry = {
       title: currentNoteTitle,
@@ -100,16 +98,20 @@ const NoteButtonsComponent = () => {
 
   return (
     <Box sx={{ display: "flex", gap: "5px" }}>
-      <IconButton
-        loading={isSaving}
-        onClick={handleSave}
-        disabled={!currentNoteContent || !currentNoteTitle}
-      >
-        <SaveIcon />
-      </IconButton>
-      <IconButton loading={isDeleting} onClick={handleDelete}>
-        <DeleteIcon />
-      </IconButton>
+      <Tooltip title="Zapisz notatkę">
+        <IconButton
+          loading={isSaving}
+          onClick={handleSave}
+          disabled={!currentNoteContent || !currentNoteTitle}
+        >
+          <SaveIcon />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Usuń notatkę">
+        <IconButton loading={isDeleting} onClick={handleDelete}>
+          <DeleteIcon />
+        </IconButton>
+      </Tooltip>
     </Box>
   );
 };
