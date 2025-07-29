@@ -1,0 +1,6 @@
+.titleInput::after,
+.titleInput::before {
+  border-bottom: none;
+  outline: none;
+  display: none;
+}
