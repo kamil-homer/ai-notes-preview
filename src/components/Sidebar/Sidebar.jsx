@@ -15,7 +15,7 @@ import { supabase } from "../../services/supabase-client";
 import { useNotesState } from "../../store/notes-state";
 import { Link } from "react-router";
 import { useShallow } from "zustand/react/shallow";
-import { filterNotes, sortNotesByDate } from "./sidebar";
+import { filterNotes, sortNotesByDate } from "./sidebar-utils";
 
 export const Sidebar = ({ user }) => {
   const [searchNotesInput, setSearchNotesInput] = useState("");

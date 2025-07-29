@@ -16,10 +16,12 @@ import { NoteButtons } from "../NoteButtons/NoteButtons";
 
 import "./notes.css";
 import { useShallow } from "zustand/react/shallow";
+import { useEffect, useState } from "react";
+import { ai } from "../../services/ai-studio-client";
 
 export const Notes = () => {
   const { id } = useParams();
-
+  const [isGeneratingAiContent, setIsGeneratingAiContent] = useState(false);
   const { notes, currentNoteTitle, setCurrentNoteTitle } = useNotesState(
     useShallow((state) => ({
       notes: state.notes,
@@ -28,7 +30,36 @@ export const Notes = () => {
     }))
   );
 
-  const selectedNote = notes.find((note) => note.id == id);
+  const selectedNote = id ? notes.find((note) => note.id == id) : null;
+  useEffect(() => {
+    if (selectedNote) {
+      setCurrentNoteTitle(selectedNote.title);
+    }
+    return () => setCurrentNoteTitle("");
+  }, [selectedNote]);
+
+  const handleAiTitle = async () => {
+    console.log("calling ai");
+    setIsGeneratingAiContent(true);
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: `Napisz mi tytuł dla następującego posta: 'To jest mój post o React i o jego nauce'.
+        Maksymalnie 3 wyrazy.
+        Przykłady dobrych tematów: "Notatki ze spotkania", "Lista zakupów", "Ksiązki i blogi"`,
+      config: {
+        thinkingConfig: {
+          thinkingBudget: 0, // Disables thinking
+        },
+      },
+    });
+    setIsGeneratingAiContent(false);
+    console.log(response);
+    setCurrentNoteTitle(response.text);
+  };
+
+  const modificationDate = selectedNote
+    ? new Date(selectedNote.updated_at).toLocaleDateString()
+    : new Date().toLocaleDateString();
 
   return (
     <Box>
@@ -39,21 +70,23 @@ export const Notes = () => {
           alignItems: "center",
         }}
       >
-        <Typography variant="caption">{new Date().toDateString()}</Typography>
+        <Typography variant="caption">{modificationDate}</Typography>
         <NoteButtons />
       </Box>
       <Box>
         <Input
-          id="standard-adornment-password"
-          type={"text"}
-          placeholder="Podaj tytuł"
-          sx={{ marginBottom: "20px", borderBottom: "none" }}
+          type="text"
+          placeholder="Podaj nowy tytuł"
+          sx={{ marginBottom: "20px", borderBottom: "none", width: "100%" }}
           className="titleInput"
-          value={selectedNote ? selectedNote.title : currentNoteTitle}
+          value={currentNoteTitle}
           onChange={(e) => setCurrentNoteTitle(e.target.value)}
           startAdornment={
             <InputAdornment position="start">
-              <IconButton onClick={() => console.log("AI call...")}>
+              <IconButton
+                onClick={handleAiTitle}
+                loading={isGeneratingAiContent}
+              >
                 <AutoAwesomeIcon />
               </IconButton>
             </InputAdornment>

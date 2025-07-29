@@ -7,6 +7,23 @@ import { memo, useState } from "react";
 import { useParams } from "react-router";
 import { useShallow } from "zustand/react/shallow";
 
+const tags = [
+  "React",
+  "JavaScript",
+  "NodeJS",
+  "TypeScript",
+  "HTML",
+  "CSS",
+  "Redux",
+  "GraphQL",
+  "NextJS",
+];
+
+const getRandomTag = (tags) => {
+  const index = Math.floor(Math.random() * tags.length);
+  return tags[index];
+};
+
 const NoteButtonsComponent = () => {
   const { id } = useParams();
   const [isSaving, setIsSaving] = useState(false);
@@ -18,6 +35,7 @@ const NoteButtonsComponent = () => {
     currentNoteTitle,
     currentNoteContent,
     currentNotePlainText,
+    updateNote,
   } = useNotesState(
     useShallow((state) => ({
       addNote: state.addNote,
@@ -25,19 +43,21 @@ const NoteButtonsComponent = () => {
       currentNoteTitle: state.currentNoteTitle,
       currentNoteContent: state.currentNoteContent,
       currentNotePlainText: state.currentNotePlainText,
+      updateNote: state.updateNote,
     }))
   );
 
   const handleSave = async () => {
     setIsSaving(true);
     // generate by AI
-    const noteTag = "";
+    const noteTag = getRandomTag(tags);
 
     const newEntry = {
       title: currentNoteTitle,
       content: currentNoteContent,
       plainTextContent: currentNotePlainText,
       tag: noteTag,
+      updated_at: new Date(),
     };
 
     if (!id) {
@@ -57,7 +77,7 @@ const NoteButtonsComponent = () => {
         .eq("id", id)
         .select();
       if (data) {
-        addNote(data);
+        updateNote(data[0], id);
       }
       console.log(data, error);
     }
