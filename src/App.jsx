@@ -32,7 +32,11 @@ export const App = () => {
           flexDirection: "column",
         }}
       >
-        <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} />
+        <Auth
+          supabaseClient={supabase}
+          appearance={{ theme: ThemeSupa }}
+          providers={[]}
+        />
       </Box>
     );
   } else {

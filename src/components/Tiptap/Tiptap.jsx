@@ -35,14 +35,12 @@ export const Tiptap = () => {
     onUpdate: ({ editor }) => {
       const content = editor.getJSON();
       const plaintext = editor.getText({ blockSeparator: "" });
-      console.log(plaintext);
       setCurrentNoteContent(content);
       setCurrentNotePlainText(plaintext);
     },
   });
 
   useEffect(() => {
-    console.log(selectedNote);
     // this is just an example. do whatever you want to do here
     // to retrieve your editors content from somewhere
     editor.commands.setContent(selectedNote?.content || "");

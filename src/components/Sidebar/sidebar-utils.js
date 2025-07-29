@@ -3,7 +3,7 @@ export const filterNotes = (notes, searchInput) => {
     return notes;
   }
   const filteredNotes = notes.reduce((acc, current) => {
-    if (current.title.toLowerCase().includes(searchInput)) {
+    if (current.title.toLowerCase().includes(searchInput.toLowerCase())) {
       acc.push(current);
     }
     return acc;

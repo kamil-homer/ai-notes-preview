@@ -9,25 +9,11 @@ export const useNotesState = create((set) => ({
   addNote: (newNote) => set((state) => ({ notes: [...state.notes, newNote] })),
   updateNote: (updatedNote, id) =>
     set((state) => {
-      console.log(updatedNote, id);
       return {
         notes: state.notes.map((note) =>
           note.id != id ? note : { ...note, ...updatedNote }
         ),
       };
-    }),
-  updateNoteTitle: ({ newTitle, id }) =>
-    set((state) => {
-      console.log(newTitle, id);
-      const updatedNotes = state.notes.map((note) => {
-        if (note.id === id) {
-          return {
-            ...note,
-            title: newTitle,
-          };
-        }
-      });
-      return { notes: updatedNotes };
     }),
   removeNote: (deletedNote) =>
     set((state) => ({
