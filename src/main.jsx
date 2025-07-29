@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router";
+import { HashRouter, Routes, Route } from "react-router";
 
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -17,10 +17,10 @@ const root = document.getElementById("root");
 
 createRoot(root).render(
   <StrictMode>
-    <BrowserRouter>
+    <HashRouter>
       <Routes>
         <Route path="/:id?" element={<App />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   </StrictMode>
 );
