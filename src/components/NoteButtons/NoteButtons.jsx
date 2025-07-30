@@ -4,15 +4,23 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useNotesState } from "../../store/notes-state";
 import { supabase } from "../../services/supabase-client";
 import { memo, useState } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useShallow } from "zustand/react/shallow";
 import { ai } from "../../services/ai-studio-client";
 import { generateTagPrompt } from "../../prompts/prompts";
+import { useUserState } from "../../store/userState";
 
 const NoteButtonsComponent = () => {
+  const navigation = useNavigate();
   const { id } = useParams();
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const { user } = useUserState(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
 
   const {
     addNote,
@@ -35,22 +43,23 @@ const NoteButtonsComponent = () => {
   const handleSave = async () => {
     setIsSaving(true);
     let noteTag = "";
-    try {
-      const noteTagResponse = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: generateTagPrompt(currentNotePlainText),
-        config: {
-          thinkingConfig: {
-            thinkingBudget: 0, // Disables thinking
-          },
-        },
-      });
-      noteTag = noteTagResponse.text;
-    } catch (error) {
-      console.log("Error generating AI title:", error);
-    }
+    // try {
+    //   const noteTagResponse = await ai.models.generateContent({
+    //     model: "gemini-2.5-flash",
+    //     contents: generateTagPrompt(currentNotePlainText),
+    //     config: {
+    //       thinkingConfig: {
+    //         thinkingBudget: 0, // Disables thinking
+    //       },
+    //     },
+    //   });
+    //   noteTag = noteTagResponse.text;
+    // } catch (error) {
+    //   console.log("Error generating AI title:", error);
+    // }
 
     const newEntry = {
+      userId: user.id,
       title: currentNoteTitle,
       content: currentNoteContent,
       plainTextContent: currentNotePlainText,
@@ -66,6 +75,7 @@ const NoteButtonsComponent = () => {
         .select();
       if (data) {
         addNote(data);
+        navigation(`/${data.id}`);
       }
       console.log(data, error);
     } else {

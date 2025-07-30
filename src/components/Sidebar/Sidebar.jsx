@@ -19,8 +19,15 @@ import { Link } from "react-router";
 import { useShallow } from "zustand/react/shallow";
 import { filterNotes, sortNotesByDate } from "./sidebar-utils";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { useUserState } from "../../store/userState";
 
-export const Sidebar = ({ user }) => {
+export const Sidebar = () => {
+  const { user } = useUserState(
+    useShallow((state) => ({
+      user: state.user,
+    }))
+  );
+
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -48,7 +55,11 @@ export const Sidebar = ({ user }) => {
 
   useEffect(() => {
     const fetchNotes = async () => {
-      const { data, error } = await supabase.from("notes").select("*");
+      console.log("Fetching...");
+      const { data, error } = await supabase
+        .from("notes")
+        .select("*")
+        .eq("userId", user.id);
       if (error) {
         console.log("Error fetching:", error);
       } else {
@@ -56,7 +67,7 @@ export const Sidebar = ({ user }) => {
       }
     };
     fetchNotes();
-  }, []);
+  }, [user]);
 
   const notesToDisplay = sortNotesByDate(filterNotes(notes, searchNotesInput));
 
@@ -70,7 +81,7 @@ export const Sidebar = ({ user }) => {
           marginBottom: "25px",
         }}
       >
-        <Avatar>{user?.slice(0, 1).toUpperCase()}</Avatar>
+        <Avatar>{user?.email?.slice(0, 1).toUpperCase()}</Avatar>
         <Typography
           onClick={handleClick}
           sx={{
@@ -80,7 +91,7 @@ export const Sidebar = ({ user }) => {
             cursor: "pointer",
           }}
         >
-          {user}
+          {user?.email}
         </Typography>
         <Menu
           dense
