@@ -1,6 +1,34 @@
+.titleInput {
+  position: relative;
+}
+
 .titleInput::after,
 .titleInput::before {
-  border-bottom: none;
+  border-bottom: none !important;
   outline: none;
   display: none;
+}
+
+.titleInput input {
+  outline: none;
+  border: none;
+  background: transparent;
+}
+
+.titleInput input::placeholder {
+  color: #999;
+  opacity: 0.8;
+}
+
+/* Responsive styles dla title input */
+@media (max-width: 768px) {
+  .titleInput input {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .titleInput input {
+    font-size: 1rem;
+  }
 }

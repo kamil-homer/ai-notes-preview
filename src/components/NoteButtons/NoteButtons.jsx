@@ -6,8 +6,6 @@ import { supabase } from "../../services/supabase-client";
 import { memo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useShallow } from "zustand/react/shallow";
-import { ai } from "../../services/ai-studio-client";
-import { generateTagPrompt } from "../../prompts/prompts";
 import { useUserState } from "../../store/userState";
 
 const NoteButtonsComponent = () => {
@@ -101,27 +99,77 @@ const NoteButtonsComponent = () => {
       .select();
     if (data) {
       removeNote(data[0]);
+        navigation(`/`);
     }
     console.log(data, error);
+    
     setIsDeleting(false);
   };
 
   return (
-    <Box sx={{ display: "flex", gap: "5px" }}>
-      <Tooltip title="Zapisz notatkę">
+    <Box 
+      sx={{ 
+        display: "flex", 
+        gap: { xs: "8px", sm: "12px" },
+        flexShrink: 0,
+      }}
+    >
+      <Tooltip title="Zapisz notatkę" arrow placement="top">
         <IconButton
           loading={isSaving}
           onClick={handleSave}
           disabled={!currentNoteContent || !currentNoteTitle}
+          sx={{ 
+            padding: { xs: '8px', sm: '10px' },
+            backgroundColor: 'primary.main',
+            color: 'white',
+            borderRadius: '10px',
+            transition: 'all 0.2s ease',
+            boxShadow: '0 2px 8px rgba(25, 118, 210, 0.3)',
+            '&:hover': {
+              backgroundColor: 'primary.dark',
+              boxShadow: '0 3px 10px rgba(25, 118, 210, 0.4)',
+            },
+            '&:disabled': {
+              backgroundColor: '#e0e0e0',
+              color: '#9e9e9e',
+              boxShadow: 'none',
+            },
+          }}
         >
-          <SaveIcon />
+          <SaveIcon fontSize="small" />
         </IconButton>
       </Tooltip>
-      <Tooltip title="Usuń notatkę">
-        <IconButton loading={isDeleting} onClick={handleDelete}>
-          <DeleteIcon />
-        </IconButton>
-      </Tooltip>
+      {id && (
+        <Tooltip title="Usuń notatkę" arrow placement="top">
+          <IconButton 
+            loading={isDeleting} 
+            onClick={handleDelete}
+            sx={{ 
+              padding: { xs: '8px', sm: '10px' },
+              backgroundColor: '#fff',
+              color: '#d32f2f',
+              border: '1px solid #ffcdd2',
+              borderRadius: '10px',
+              transition: 'all 0.2s ease',
+              '&:hover': {
+                backgroundColor: '#ffebee',
+                borderColor: '#ef5350',
+                color: '#c62828',
+                boxShadow: '0 3px 8px rgba(211, 47, 47, 0.2)',
+              },
+              '&:disabled': {
+                backgroundColor: '#f5f5f5',
+                color: '#bdbdbd',
+                borderColor: '#e0e0e0',
+                boxShadow: 'none',
+              },
+            }}
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      )}
     </Box>
   );
 };

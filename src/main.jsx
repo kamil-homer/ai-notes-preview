@@ -1,6 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { HashRouter, Routes, Route } from "react-router";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
@@ -13,14 +15,49 @@ import "./index.css";
 
 import { App } from "./App.jsx";
 
+const theme = createTheme({
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 600,
+      md: 900,
+      lg: 1200,
+      xl: 1536,
+    },
+  },
+  typography: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+  },
+  components: {
+    MuiCssBaseline: {
+      styleOverrides: {
+        '*': {
+          boxSizing: 'border-box',
+        },
+        html: {
+          WebkitFontSmoothing: 'antialiased',
+          MozOsxFontSmoothing: 'grayscale',
+        },
+        body: {
+          margin: 0,
+          padding: 0,
+        },
+      },
+    },
+  },
+});
+
 const root = document.getElementById("root");
 
 createRoot(root).render(
   <StrictMode>
-    <HashRouter>
-      <Routes>
-        <Route path="/:id?" element={<App />} />
-      </Routes>
-    </HashRouter>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <HashRouter>
+        <Routes>
+          <Route path="/:id?" element={<App />} />
+        </Routes>
+      </HashRouter>
+    </ThemeProvider>
   </StrictMode>
 );

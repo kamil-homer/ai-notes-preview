@@ -38,7 +38,7 @@ export const Notes = () => {
       setCurrentNoteTitle(selectedNote.title);
     }
     return () => setCurrentNoteTitle("");
-  }, [selectedNote]);
+  }, [selectedNote, setCurrentNoteTitle]);
 
   const handleAiTitle = async () => {
     setIsGeneratingAiContent(true);
@@ -65,41 +65,86 @@ export const Notes = () => {
     : new Date().toLocaleDateString();
 
   return (
-    <Box>
+    <Box sx={{ maxWidth: '100%', overflow: 'hidden' }}>
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          flexWrap: { xs: 'wrap', sm: 'nowrap' },
+          gap: { xs: 1, sm: 0 },
+          marginBottom: 2,
         }}
       >
-        <Typography variant="caption">{modificationDate}</Typography>
+        <Typography variant="caption" color="text.secondary">
+          {modificationDate}
+        </Typography>
         <NoteButtons />
       </Box>
-      <Box>
+      <Box sx={{ marginBottom: 3 }}>
         <Input
           type="text"
           placeholder="Podaj nowy tytuł"
-          sx={{ marginBottom: "20px", borderBottom: "none", width: "100%" }}
+          sx={{ 
+            marginBottom: "20px", 
+            borderBottom: "2px solid #e0e0e0", 
+            width: "100%",
+            fontSize: { xs: '1.1rem', sm: '1.3rem' },
+            fontWeight: 500,
+            padding: "12px 0",
+            transition: 'border-color 0.2s ease',
+            '&:hover': {
+              borderBottomColor: '#bdbdbd',
+            },
+            '&:focus-within': {
+              borderBottomColor: 'primary.main',
+            },
+            '&::before, &::after': {
+              display: 'none',
+            },
+          }}
           className="titleInput"
           value={currentNoteTitle}
           onChange={(e) => setCurrentNoteTitle(e.target.value)}
           startAdornment={
             <InputAdornment position="start">
-              <Tooltip title="Wygeneruj tytuł przez AI">
+              <Tooltip title="Wygeneruj tytuł przez AI" arrow placement="top">
                 <IconButton
                   onClick={handleAiTitle}
                   loading={isGeneratingAiContent}
-                  disabled={false}
+                  disabled={!currentNotePlainText || isGeneratingAiContent}
+                  size="small"
+                  sx={{
+                    marginRight: 1,
+                    backgroundColor: isGeneratingAiContent ? '#f5f5f5' : '#667eea',
+                    color: isGeneratingAiContent ? '#999' : 'white',
+                    borderRadius: '8px',
+                    padding: '8px',
+                    transition: 'all 0.2s ease',
+                    border: '1px solid #667eea',
+                    '&:hover': {
+                      backgroundColor: isGeneratingAiContent ? '#f5f5f5' : '#5a6fd8',
+                      borderColor: '#5a6fd8',
+                    },
+                    '&:disabled': {
+                      backgroundColor: '#f5f5f5',
+                      color: '#ccc',
+                      borderColor: '#e0e0e0',
+                    },
+                  }}
                 >
-                  <AutoAwesomeIcon />
+                  <AutoAwesomeIcon 
+                    fontSize="medium"
+                  />
                 </IconButton>
               </Tooltip>
             </InputAdornment>
           }
         />
       </Box>
-      <Tiptap />
+      <Box sx={{ width: '100%', overflow: 'hidden' }}>
+        <Tiptap />
+      </Box>
     </Box>
   );
 };

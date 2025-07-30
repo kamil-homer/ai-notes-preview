@@ -1,14 +1,31 @@
-import { Box } from "@mui/material";
+import { 
+  Box, 
+  Drawer, 
+  AppBar, 
+  Toolbar, 
+  IconButton, 
+  useMediaQuery,
+  useTheme,
+  CircularProgress
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
 import { Sidebar } from "./components/Sidebar/Sidebar";
 import { Notes } from "./components/Notes/Notes";
-import { useEffect } from "react";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
+import { Auth } from "./components/Auth/Auth";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
 import { supabase } from "./services/supabase-client";
 import { useUserState } from "./store/userState";
 import { useShallow } from "zustand/react/shallow";
 
 export const App = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const { id } = useParams();
+
   const { user, setUser } = useUserState(
     useShallow((state) => ({
       user: state.user,
@@ -17,56 +34,123 @@ export const App = () => {
   );
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session.user);
-    });
+    const initializeAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user || null);
+      setIsLoading(false);
+    };
+
+    initializeAuth();
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session.user);
+      setUser(session?.user || null);
+      setIsLoading(false);
     });
+    
     return () => subscription.unsubscribe();
   }, [setUser]);
 
-  if (!user) {
+  // Przekieruj na stronę główną jeśli użytkownik nie jest zalogowany i próbuje dostać się do konkretnej notatki
+  useEffect(() => {
+    if (!isLoading && !user && id) {
+      navigate('/', { replace: true });
+    }
+  }, [user, id, navigate, isLoading]);
+
+  const handleDrawerToggle = () => {
+    setDrawerOpen(!drawerOpen);
+  };
+
+  const drawerWidth = 280;
+
+  // Loading screen
+  if (isLoading) {
     return (
       <Box
         sx={{
-          minHeight: "100vh",
-          width: "25vw",
-          margin: "auto",
-          display: "flex",
-          flexDirection: "column",
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: '#fafafa',
         }}
       >
-        <Auth
-          supabaseClient={supabase}
-          appearance={{ theme: ThemeSupa }}
-          providers={[]}
-        />
-      </Box>
-    );
-  } else {
-    return (
-      <Box
-        sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}
-      >
-        <Box sx={{ flex: 1, display: "flex" }}>
-          <Box
-            elevation={1}
-            sx={{
-              width: 250,
-              p: 2,
-              borderRight: "1px solid #e0e0e0",
-            }}
-          >
-            <Sidebar />
-          </Box>
-          <Box sx={{ flex: 1, p: 3 }}>
-            <Notes />
-          </Box>
-        </Box>
+        <CircularProgress size={40} />
       </Box>
     );
   }
+
+  if (!user && !isLoading) {
+    return <Auth />;
+  }
+
+  return (
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+      {/* AppBar dla mobile */}
+      {isMobile && (
+        <AppBar 
+          position="fixed" 
+          sx={{ 
+            zIndex: theme.zIndex.drawer + 1,
+            backgroundColor: 'white',
+            color: 'black',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+          }}
+        >
+          <Toolbar>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2 }}
+            >
+              <MenuIcon />
+            </IconButton>
+          </Toolbar>
+        </AppBar>
+      )}
+
+      {/* Drawer/Sidebar */}
+      <Drawer
+        variant={isMobile ? "temporary" : "permanent"}
+        open={isMobile ? drawerOpen : true}
+        onClose={handleDrawerToggle}
+        ModalProps={{
+          keepMounted: true, // Better open performance on mobile
+        }}
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          '& .MuiDrawer-paper': {
+            width: drawerWidth,
+            boxSizing: 'border-box',
+            marginTop: isMobile ? '64px' : 0,
+            height: isMobile ? 'calc(100vh - 64px)' : '100vh',
+            overflowY: 'auto',
+            borderRight: '1px solid #e0e0e0',
+          },
+        }}
+      >
+        <Sidebar onItemClick={() => isMobile && setDrawerOpen(false)} />
+      </Drawer>
+
+      {/* Main content */}
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          marginTop: isMobile ? '64px' : 0,
+          marginLeft: isMobile ? 0 : 0,
+          minHeight: '100vh',
+          overflowY: 'auto',
+        }}
+      >
+        <Notes />
+      </Box>
+    </Box>
+  );
 };
