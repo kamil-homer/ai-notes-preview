@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Card,
@@ -13,22 +13,6 @@ import {
 } from '@mui/material';
 import { supabase } from '../../services/supabase-client';
 
-// Helper function to translate error messages
-const getErrorMessage = (error) => {
-  const errorMessages = {
-    'Invalid login credentials': 'Nieprawidłowy email lub hasło',
-    'Email not confirmed': 'Email nie został potwierdzony. Sprawdź swoją skrzynkę pocztową.',
-    'Password should be at least 6 characters': 'Hasło musi mieć co najmniej 6 znaków',
-    'Unable to validate email address: invalid format': 'Nieprawidłowy format adresu email',
-    'Email address not authorized': 'Adres email nie jest autoryzowany',
-    'Email rate limit exceeded': 'Przekroczono limit wysyłania emaili. Spróbuj ponownie później.',
-    'Signup is disabled': 'Rejestracja jest wyłączona',
-    'User already registered': 'Użytkownik o tym adresie email już istnieje',
-  };
-  
-  return errorMessages[error] || error;
-};
-
 export const Auth = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
@@ -37,9 +21,7 @@ export const Auth = () => {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
-  // Validation state - tylko pokazuj błędy po interakcji użytkownika
-  const [emailTouched, setEmailTouched] = useState(false);
-  const [passwordTouched, setPasswordTouched] = useState(false);
+  // Validation state
   const [showEmailError, setShowEmailError] = useState(false);
   const [showPasswordError, setShowPasswordError] = useState(false);
 
@@ -48,38 +30,13 @@ export const Auth = () => {
   const isPasswordValid = password.length >= 6;
   const isFormValid = isEmailValid && isPasswordValid;
 
-  // Debounced validation - pokaż błąd 1.5s po przestaniu pisać
-  useEffect(() => {
-    if (!emailTouched) return;
-    
-    const timer = setTimeout(() => {
-      setShowEmailError(!isEmailValid && email.length > 0);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, [email, emailTouched, isEmailValid]);
-
-  useEffect(() => {
-    if (!passwordTouched) return;
-    
-    const timer = setTimeout(() => {
-      setShowPasswordError(!isPasswordValid && password.length > 0);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, [password, passwordTouched, isPasswordValid]);
-
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
-    setEmailTouched(true);
-    // Ukryj błąd podczas pisania
     setShowEmailError(false);
   };
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
-    setPasswordTouched(true);
-    // Ukryj błąd podczas pisania
     setShowPasswordError(false);
   };
 
@@ -124,7 +81,7 @@ export const Auth = () => {
         setMessage('Sprawdź swoją skrzynkę e-mail w celu weryfikacji konta.');
       }
     } catch (error) {
-      setError(getErrorMessage(error.message));
+      setError(error.message);
     }
     
     setLoading(false);
@@ -144,7 +101,7 @@ export const Auth = () => {
       if (error) throw error;
       setMessage('Instrukcje resetowania hasła zostały wysłane na Twój e-mail.');
     } catch (error) {
-      setError(getErrorMessage(error.message));
+      setError(error.message);
     }
     
     setLoading(false);
@@ -158,61 +115,20 @@ export const Auth = () => {
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: '#fafafa',
-        padding: { xs: 1, sm: 2 },
+        padding: 2,
       }}
     >
-      <Card
-        sx={{
-          maxWidth: 420,
-          width: '100%',
-          boxShadow: {
-            xs: 'none',
-            sm: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          },
-          borderRadius: { xs: 0, sm: 2 },
-          backgroundColor: 'white',
-        }}
-      >
-        <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
-          <Typography
-            variant="h4"
-            component="h1"
-            gutterBottom
-            sx={{
-              textAlign: 'center',
-              fontWeight: 'light',
-              color: 'text.primary',
-              mb: 1,
-              fontSize: { xs: '1.75rem', sm: '2.125rem' },
-            }}
-          >
+      <Card sx={{ maxWidth: 420, width: '100%' }}>
+        <CardContent sx={{ p: 4 }}>
+          <Typography variant="h4" component="h1" gutterBottom sx={{ textAlign: 'center' }}>
             AI Notes
           </Typography>
 
-          <Typography
-            variant="body2"
-            sx={{
-              textAlign: 'center',
-              color: 'text.secondary',
-              mb: 4,
-              fontSize: '0.875rem',
-            }}
-          >
+          <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', mb: 4 }}>
             Inteligentne notatki z pomocą AI
           </Typography>
 
-          <Typography
-            variant="h6"
-            component="h2"
-            gutterBottom
-            sx={{
-              textAlign: 'center',
-              color: 'text.primary',
-              mb: 3,
-              fontWeight: 'medium',
-              fontSize: { xs: '1.1rem', sm: '1.25rem' },
-            }}
-          >
+          <Typography variant="h6" component="h2" gutterBottom sx={{ textAlign: 'center', mb: 3 }}>
             {isLogin ? 'Zaloguj się' : 'Utwórz konto'}
           </Typography>
 
@@ -230,7 +146,6 @@ export const Auth = () => {
 
           <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
             <TextField
-              margin="normal"
               required
               fullWidth
               id="email"
@@ -242,27 +157,12 @@ export const Auth = () => {
               onChange={handleEmailChange}
               onBlur={handleEmailBlur}
               disabled={loading}
-              size="medium"
               error={showEmailError}
-              helperText={showEmailError ? 'Wprowadź prawidłowy adres e-mail' : ' '}
-              slotProps={{
-                formHelperText: {
-                  sx: {
-                    minHeight: '20px',
-                    margin: '3px 14px 0',
-                  }
-                }
-              }}
-              sx={{ 
-                mb: 2,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                },
-              }}
+              helperText={showEmailError ? 'Wprowadź prawidłowy adres e-mail' : ''}
+              sx={{ mb: 2 }}
             />
 
             <TextField
-              margin="normal"
               required
               fullWidth
               name="password"
@@ -274,46 +174,16 @@ export const Auth = () => {
               onChange={handlePasswordChange}
               onBlur={handlePasswordBlur}
               disabled={loading}
-              size="medium"
               error={showPasswordError}
-              helperText={showPasswordError ? 'Hasło musi mieć co najmniej 6 znaków' : ' '}
-              slotProps={{
-                formHelperText: {
-                  sx: {
-                    minHeight: '20px',
-                    margin: '3px 14px 0',
-                  }
-                }
-              }}
-              sx={{ 
-                mt: 0,
-                mb: 3,
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 2,
-                },
-              }}
+              helperText={showPasswordError ? 'Hasło musi mieć co najmniej 6 znaków' : ''}
+              sx={{ mb: 3 }}
             />
 
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              sx={{
-                mt: 1,
-                mb: 2,
-                py: { xs: 1.2, sm: 1.5 },
-                fontSize: { xs: '0.9rem', sm: '1rem' },
-                textTransform: 'none',
-                borderRadius: 2,
-                fontWeight: 'medium',
-                boxShadow: '0 2px 8px rgba(25, 118, 210, 0.3)',
-                '&:hover': {
-                  boxShadow: '0 4px 12px rgba(25, 118, 210, 0.4)',
-                },
-                '&:disabled': {
-                  boxShadow: 'none',
-                },
-              }}
+              sx={{ mt: 1, mb: 2, py: 1.5 }}
               disabled={loading || !isFormValid}
             >
               {loading ? (
@@ -331,17 +201,6 @@ export const Auth = () => {
                   variant="body2"
                   onClick={handleForgotPassword}
                   disabled={loading}
-                  sx={{
-                    textDecoration: 'none',
-                    color: 'primary.main',
-                    fontSize: '0.875rem',
-                    '&:hover': {
-                      textDecoration: 'underline',
-                    },
-                    '&:disabled': {
-                      color: 'text.disabled',
-                    },
-                  }}
                 >
                   Zapomniałeś hasła?
                 </Link>
@@ -367,20 +226,10 @@ export const Auth = () => {
                   setMessage('');
                   setEmail('');
                   setPassword('');
-                  // Reset validation state
-                  setEmailTouched(false);
-                  setPasswordTouched(false);
                   setShowEmailError(false);
                   setShowPasswordError(false);
                 }}
                 disabled={loading}
-                sx={{
-                  textTransform: 'none',
-                  fontWeight: 'medium',
-                  fontSize: '0.9rem',
-                  minHeight: 'auto',
-                  padding: '4px 8px',
-                }}
               >
                 {isLogin ? 'Utwórz konto' : 'Zaloguj się'}
               </Button>
