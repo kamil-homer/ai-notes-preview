@@ -3,7 +3,7 @@ import Highlight from "@tiptap/extension-highlight";
 import Typography from "@tiptap/extension-typography";
 import StarterKit from "@tiptap/starter-kit";
 import "./tiptap.css";
-import { useNotesState } from "../../store/notes-state";
+import { useNotesState } from "../../store/notesState";
 import { useEffect } from "react";
 import { useParams } from "react-router";
 import { useShallow } from "zustand/react/shallow";
@@ -41,8 +41,6 @@ export const Tiptap = () => {
   });
 
   useEffect(() => {
-    // this is just an example. do whatever you want to do here
-    // to retrieve your editors content from somewhere
     editor.commands.setContent(selectedNote?.content || "");
   }, [editor, id, selectedNote]);
 

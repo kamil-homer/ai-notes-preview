@@ -18,6 +18,8 @@ import { supabase } from "./services/supabase-client";
 import { useUserState } from "./store/userState";
 import { useShallow } from "zustand/react/shallow";
 
+  const drawerWidth = 280;
+  
 export const App = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -52,7 +54,6 @@ export const App = () => {
     return () => subscription.unsubscribe();
   }, [setUser]);
 
-  // Przekieruj na stronę główną jeśli użytkownik nie jest zalogowany i próbuje dostać się do konkretnej notatki
   useEffect(() => {
     if (!isLoading && !user && id) {
       navigate('/', { replace: true });
@@ -63,9 +64,7 @@ export const App = () => {
     setDrawerOpen(!drawerOpen);
   };
 
-  const drawerWidth = 280;
 
-  // Loading screen
   if (isLoading) {
     return (
       <Box
@@ -88,7 +87,6 @@ export const App = () => {
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
-      {/* AppBar dla mobile */}
       {isMobile && (
         <AppBar 
           position="fixed" 
@@ -113,20 +111,18 @@ export const App = () => {
         </AppBar>
       )}
 
-      {/* Drawer/Sidebar */}
       <Drawer
         variant={isMobile ? "temporary" : "permanent"}
         open={isMobile ? drawerOpen : true}
         onClose={handleDrawerToggle}
         ModalProps={{
-          keepMounted: true, // Better open performance on mobile
+          keepMounted: true,
         }}
         sx={{
           width: drawerWidth,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
-            boxSizing: 'border-box',
             marginTop: isMobile ? '64px' : 0,
             height: isMobile ? 'calc(100vh - 64px)' : '100vh',
             overflowY: 'auto',
@@ -137,7 +133,6 @@ export const App = () => {
         <Sidebar onItemClick={() => isMobile && setDrawerOpen(false)} />
       </Drawer>
 
-      {/* Main content */}
       <Box
         component="main"
         sx={{

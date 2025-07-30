@@ -7,9 +7,8 @@ import {
   Typography,
 } from "@mui/material";
 import { Tiptap } from "../Tiptap/Tiptap";
-import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-
-import { useNotesState } from "../../store/notes-state";
+import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
+import { useNotesState } from "../../store/notesState";
 import { useParams } from "react-router";
 import { NoteButtons } from "../NoteButtons/NoteButtons";
 
@@ -81,7 +80,7 @@ export const Notes = () => {
       </Box>
       <Box sx={{ marginBottom: 3 }}>
         <Input
-          sx={{p:2}}
+          className="titleInput"
           type="text"
           placeholder="Podaj nowy tytuł"
           fullWidth
@@ -96,7 +95,7 @@ export const Notes = () => {
                   size="small"
                   color="primary"
                 >
-                  <AutoAwesomeIcon />
+                  <AutoAwesomeOutlinedIcon />
                 </IconButton>
               </Tooltip>
             </InputAdornment>

@@ -1,26 +1,24 @@
+
+.MuiInput-root.titleInput::before {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.42);
+}
+
+.MuiInput-root.titleInput::after {
+  border-bottom: 1px solid #1976d2;
+}
+
+.MuiInput-root.titleInput:hover:not(.Mui-disabled):before {
+  border-bottom: 1px solid hsla(0, 0%, 28%, 0.87);
+}
+
 .titleInput {
-  position: relative;
+  padding: 6px;
 }
-
-.titleInput::after,
-.titleInput::before {
-  border-bottom: none !important;
-  outline: none;
-  display: none;
-}
-
-.titleInput input {
-  outline: none;
-  border: none;
-  background: transparent;
-}
-
 .titleInput input::placeholder {
   color: #999;
   opacity: 0.8;
 }
 
-/* Responsive styles dla title input */
 @media (max-width: 768px) {
   .titleInput input {
     font-size: 1.1rem;

@@ -15,7 +15,7 @@ import AddIcon from "@mui/icons-material/Add";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useEffect, useState } from "react";
 import { supabase } from "../../services/supabase-client";
-import { useNotesState } from "../../store/notes-state";
+import { useNotesState } from "../../store/notesState";
 import { Link, useParams } from "react-router";
 import { useShallow } from "zustand/react/shallow";
 import { filterNotes, sortNotesByDate } from "./sidebar-utils";
@@ -155,9 +155,6 @@ export const Sidebar = ({ onItemClick }) => {
                     color: isActive ? 'primary.main' : '#1a1a1a',
                     fontSize: '0.9rem',
                     lineHeight: 1.4,
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                   }}
@@ -178,7 +175,7 @@ export const Sidebar = ({ onItemClick }) => {
                       size="small" 
                       sx={{
                         backgroundColor: isActive ? 'primary.main' : '#e3f2fd',
-                        color: isActive ? 'white' : '#1565c0',
+                        color: isActive ? 'white' : 'primary.main',
                         fontWeight: 500,
                         fontSize: '0.75rem',
                         height: '24px',
@@ -210,7 +207,6 @@ export const Sidebar = ({ onItemClick }) => {
         })}
       </Box>
 
-      {/* Logout button na dole */}
       <Divider sx={{ marginBottom: 2 }} />
       <Button
         variant="outlined"

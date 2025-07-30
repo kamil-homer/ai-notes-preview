@@ -3,11 +3,6 @@
   line-height: 1.5;
   font-weight: 400;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
   --white: #fff;
   --black: #2e2b29;
   --black-contrast: #110f0e;
@@ -36,7 +31,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Responsive styles */
 @media (max-width: 768px) {
   body {
     font-size: 14px;
@@ -47,29 +41,4 @@ body {
   body {
     font-size: 13px;
   }
-}
-
-/* Custom scrollbar for webkit browsers */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #c1c1c1 #f1f1f1;
-}
-
-*::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-*::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-*::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 10px;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
 }
