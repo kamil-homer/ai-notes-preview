@@ -69,7 +69,7 @@ export const App = () => {
     return (
       <Box
         sx={{
-          minHeight: '100vh',
+          minHeight: '100dvh',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -86,7 +86,7 @@ export const App = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ display: 'flex', minHeight: '100dvh' }}>
       {isMobile && (
         <AppBar 
           position="fixed" 
@@ -124,7 +124,7 @@ export const App = () => {
           '& .MuiDrawer-paper': {
             width: drawerWidth,
             marginTop: isMobile ? '64px' : 0,
-            height: isMobile ? 'calc(100vh - 64px)' : '100vh',
+            height: isMobile ? 'calc(100dvh - 64px)' : '100dvh',
             overflowY: 'auto',
             borderRight: '1px solid #e0e0e0',
           },
@@ -140,7 +140,7 @@ export const App = () => {
           p: 3,
           marginTop: isMobile ? '64px' : 0,
           marginLeft: isMobile ? 0 : 0,
-          minHeight: '100vh',
+          minHeight: '100dvh',
           overflowY: 'auto',
         }}
       >
