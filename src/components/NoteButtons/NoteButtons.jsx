@@ -3,7 +3,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useNotesState } from "../../store/notes-state";
 import { supabase } from "../../services/supabase-client";
-import { memo, useState } from "react";
+import { memo } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useShallow } from "zustand/react/shallow";
 import { useUserState } from "../../store/userState";
@@ -11,8 +11,6 @@ import { useUserState } from "../../store/userState";
 const NoteButtonsComponent = () => {
   const navigation = useNavigate();
   const { id } = useParams();
-  const [isSaving, setIsSaving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const { user } = useUserState(
     useShallow((state) => ({
@@ -39,22 +37,7 @@ const NoteButtonsComponent = () => {
   );
 
   const handleSave = async () => {
-    setIsSaving(true);
     let noteTag = "";
-    // try {
-    //   const noteTagResponse = await ai.models.generateContent({
-    //     model: "gemini-2.5-flash",
-    //     contents: generateTagPrompt(currentNotePlainText),
-    //     config: {
-    //       thinkingConfig: {
-    //         thinkingBudget: 0, // Disables thinking
-    //       },
-    //     },
-    //   });
-    //   noteTag = noteTagResponse.text;
-    // } catch (error) {
-    //   console.log("Error generating AI title:", error);
-    // }
 
     const newEntry = {
       userId: user.id,
@@ -87,11 +70,9 @@ const NoteButtonsComponent = () => {
       }
       console.log(data, error);
     }
-    setIsSaving(false);
   };
 
   const handleDelete = async () => {
-    setIsDeleting(true);
     const { data, error } = await supabase
       .from("notes")
       .delete()
@@ -102,71 +83,26 @@ const NoteButtonsComponent = () => {
         navigation(`/`);
     }
     console.log(data, error);
-    
-    setIsDeleting(false);
   };
 
   return (
-    <Box 
-      sx={{ 
-        display: "flex", 
-        gap: { xs: "8px", sm: "12px" },
-        flexShrink: 0,
-      }}
-    >
-      <Tooltip title="Zapisz notatkę" arrow placement="top">
+    <Box sx={{ display: "flex", gap: 1 }}>
+      <Tooltip title="Zapisz notatkę">
         <IconButton
-          loading={isSaving}
           onClick={handleSave}
           disabled={!currentNoteContent || !currentNoteTitle}
-          sx={{ 
-            padding: { xs: '8px', sm: '10px' },
-            backgroundColor: 'primary.main',
-            color: 'white',
-            borderRadius: '10px',
-            transition: 'all 0.2s ease',
-            boxShadow: '0 2px 8px rgba(25, 118, 210, 0.3)',
-            '&:hover': {
-              backgroundColor: 'primary.dark',
-              boxShadow: '0 3px 10px rgba(25, 118, 210, 0.4)',
-            },
-            '&:disabled': {
-              backgroundColor: '#e0e0e0',
-              color: '#9e9e9e',
-              boxShadow: 'none',
-            },
-          }}
+          color="primary"
         >
-          <SaveIcon fontSize="small" />
+          <SaveIcon />
         </IconButton>
       </Tooltip>
       {id && (
-        <Tooltip title="Usuń notatkę" arrow placement="top">
+        <Tooltip title="Usuń notatkę">
           <IconButton 
-            loading={isDeleting} 
             onClick={handleDelete}
-            sx={{ 
-              padding: { xs: '8px', sm: '10px' },
-              backgroundColor: '#fff',
-              color: '#d32f2f',
-              border: '1px solid #ffcdd2',
-              borderRadius: '10px',
-              transition: 'all 0.2s ease',
-              '&:hover': {
-                backgroundColor: '#ffebee',
-                borderColor: '#ef5350',
-                color: '#c62828',
-                boxShadow: '0 3px 8px rgba(211, 47, 47, 0.2)',
-              },
-              '&:disabled': {
-                backgroundColor: '#f5f5f5',
-                color: '#bdbdbd',
-                borderColor: '#e0e0e0',
-                boxShadow: 'none',
-              },
-            }}
+            color="error"
           >
-            <DeleteIcon fontSize="small" />
+            <DeleteIcon />
           </IconButton>
         </Tooltip>
       )}

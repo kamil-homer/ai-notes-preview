@@ -65,15 +65,13 @@ export const Notes = () => {
     : new Date().toLocaleDateString();
 
   return (
-    <Box sx={{ maxWidth: '100%', overflow: 'hidden' }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: { xs: 'wrap', sm: 'nowrap' },
-          gap: { xs: 1, sm: 0 },
-          marginBottom: 2,
+    <Box>
+      <Box 
+        sx={{ 
+          display: "flex", 
+          justifyContent: "space-between", 
+          alignItems: "center", 
+          marginBottom: 2 
         }}
       >
         <Typography variant="caption" color="text.secondary">
@@ -83,68 +81,29 @@ export const Notes = () => {
       </Box>
       <Box sx={{ marginBottom: 3 }}>
         <Input
+          sx={{p:2}}
           type="text"
           placeholder="Podaj nowy tytuł"
-          sx={{ 
-            marginBottom: "20px", 
-            borderBottom: "2px solid #e0e0e0", 
-            width: "100%",
-            fontSize: { xs: '1.1rem', sm: '1.3rem' },
-            fontWeight: 500,
-            padding: "12px 0",
-            transition: 'border-color 0.2s ease',
-            '&:hover': {
-              borderBottomColor: '#bdbdbd',
-            },
-            '&:focus-within': {
-              borderBottomColor: 'primary.main',
-            },
-            '&::before, &::after': {
-              display: 'none',
-            },
-          }}
-          className="titleInput"
+          fullWidth
           value={currentNoteTitle}
           onChange={(e) => setCurrentNoteTitle(e.target.value)}
           startAdornment={
             <InputAdornment position="start">
-              <Tooltip title="Wygeneruj tytuł przez AI" arrow placement="top">
+              <Tooltip title="Wygeneruj tytuł przez AI">
                 <IconButton
                   onClick={handleAiTitle}
-                  loading={isGeneratingAiContent}
                   disabled={!currentNotePlainText || isGeneratingAiContent}
                   size="small"
-                  sx={{
-                    marginRight: 1,
-                    backgroundColor: isGeneratingAiContent ? '#f5f5f5' : '#667eea',
-                    color: isGeneratingAiContent ? '#999' : 'white',
-                    borderRadius: '8px',
-                    padding: '8px',
-                    transition: 'all 0.2s ease',
-                    border: '1px solid #667eea',
-                    '&:hover': {
-                      backgroundColor: isGeneratingAiContent ? '#f5f5f5' : '#5a6fd8',
-                      borderColor: '#5a6fd8',
-                    },
-                    '&:disabled': {
-                      backgroundColor: '#f5f5f5',
-                      color: '#ccc',
-                      borderColor: '#e0e0e0',
-                    },
-                  }}
+                  color="primary"
                 >
-                  <AutoAwesomeIcon 
-                    fontSize="medium"
-                  />
+                  <AutoAwesomeIcon />
                 </IconButton>
               </Tooltip>
             </InputAdornment>
           }
         />
       </Box>
-      <Box sx={{ width: '100%', overflow: 'hidden' }}>
-        <Tiptap />
-      </Box>
+      <Tiptap />
     </Box>
   );
 };

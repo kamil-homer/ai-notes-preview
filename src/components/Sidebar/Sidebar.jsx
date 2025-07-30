@@ -71,31 +71,28 @@ export const Sidebar = ({ onItemClick }) => {
         p: 2,
       }}
     >
-      {/* Header z avatarem */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: "15px",
-          marginBottom: "25px",
+      <Box 
+        sx={{ 
+          display: "flex", 
+          alignItems: "center", 
+          gap: 2, 
+          marginBottom: 3 
         }}
       >
         <Avatar>{user?.email?.slice(0, 1).toUpperCase()}</Avatar>
-        <Typography
-          sx={{
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            textOverflow: "ellipsis",
-            cursor: "pointer",
-            flex: 1,
-          }}
-        >
+        <Typography noWrap>
           {user?.email}
         </Typography>
       </Box>
 
-      {/* Search field */}
       <TextField
+        label="Wyszukaj notatki"
+        type="search"
+        size="small"
+        fullWidth
+        value={searchNotesInput}
+        onChange={(e) => setSearchNotesInput(e.target.value)}
+        sx={{ marginBottom: 2 }}
         slotProps={{
           input: {
             startAdornment: (
@@ -105,12 +102,6 @@ export const Sidebar = ({ onItemClick }) => {
             ),
           },
         }}
-        label="Wyszukaj notatki"
-        type="search"
-        value={searchNotesInput}
-        onChange={(e) => setSearchNotesInput(e.target.value)}
-        sx={{ marginBottom: "15px" }}
-        size="small"
       />
 
       {/* Notes header */}
@@ -136,22 +127,7 @@ export const Sidebar = ({ onItemClick }) => {
       <Box 
         sx={{ 
           flex: 1, 
-          overflowY: 'auto',
-          marginBottom: 2,
-          '&::-webkit-scrollbar': {
-            width: '6px',
-          },
-          '&::-webkit-scrollbar-track': {
-            background: '#f1f1f1',
-            borderRadius: '10px',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            background: '#c1c1c1',
-            borderRadius: '10px',
-          },
-          '&::-webkit-scrollbar-thumb:hover': {
-            background: '#a8a8a8',
-          },
+          overflowY: "auto" 
         }}
       >
         {notesToDisplay.map((note) => {
@@ -165,24 +141,10 @@ export const Sidebar = ({ onItemClick }) => {
               onClick={onItemClick}
             >
               <Paper
-                elevation={0}
+                elevation={isActive ? 3 : 1}
                 sx={{
-                  marginBottom: "12px",
-                  padding: "16px",
-                  cursor: 'pointer',
-                  border: isActive ? '2px solid' : '2px solid #e0e0e0',
-                  borderColor: isActive ? 'primary.main' : '#e0e0e0',
-                  borderRadius: '12px',
-                  backgroundColor: isActive ? '#f3f6ff' : '#ffffff',
-                  transition: 'all 0.2s ease',
-                  position: 'relative',
-                  '&:hover': {
-                    backgroundColor: isActive ? '#e8f1ff' : '#f8f9fa',
-                    borderColor: isActive ? 'primary.dark' : '#d0d7de',
-                    boxShadow: isActive 
-                      ? '0 2px 8px rgba(25, 118, 210, 0.12)' 
-                      : '0 2px 8px rgba(0, 0, 0, 0.08)',
-                  },
+                  padding: 2,
+                  margin: "5px 5px 10px 5px"
                 }}
               >
                 <Typography 
