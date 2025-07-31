@@ -1,19 +1,19 @@
-import { create } from "zustand";
+import { create } from 'zustand'
 
 export const useNotesState = create((set) => ({
   notes: [],
-  currentNoteTitle: "",
+  currentNoteTitle: '',
   currentNoteContent: {},
-  currentNotePlainText: "",
+  currentNotePlainText: '',
   setNotes: (newNotes) => set({ notes: newNotes }),
-  addNote: (newNote) => set((state) => ({ notes: [...state.notes, newNote] })),
+  addNote: (newNote) => set((state) => ({ notes: [ ...state.notes, newNote ]})),
   updateNote: (updatedNote, id) =>
     set((state) => {
       return {
         notes: state.notes.map((note) =>
           note.id != id ? note : { ...note, ...updatedNote }
         ),
-      };
+      }
     }),
   removeNote: (deletedNote) =>
     set((state) => ({
@@ -24,4 +24,4 @@ export const useNotesState = create((set) => ({
     set({ currentNoteContent: newContent }),
   setCurrentNotePlainText: (newPlainText) =>
     set({ currentNotePlainText: newPlainText }),
-}));
+}))

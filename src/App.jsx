@@ -7,62 +7,63 @@ import {
   useMediaQuery,
   useTheme,
   CircularProgress
-} from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import { Sidebar } from "./components/Sidebar/Sidebar";
-import { Notes } from "./components/Notes/Notes";
-import { Auth } from "./components/Auth/Auth";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
-import { supabase } from "./services/supabase-client";
-import { useUserState } from "./store/userState";
-import { useShallow } from "zustand/react/shallow";
+} from '@mui/material'
+import MenuIcon from '@mui/icons-material/Menu'
+import { Sidebar } from './components/Sidebar/Sidebar'
+import { Notes } from './components/Notes/Notes'
+import { Auth } from './components/Auth/Auth'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router'
+import { supabase } from './services/supabase-client'
+import { useUserState } from './store/userState'
+import { useShallow } from 'zustand/react/shallow'
 
-  const drawerWidth = 280;
-  
+const drawerWidth = 280
+const actionBarHeight = 56
+
 export const App = () => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-  const { id } = useParams();
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
+  const [ drawerOpen, setDrawerOpen ] = useState(false)
+  const [ isLoading, setIsLoading ] = useState(true)
+  const navigate = useNavigate()
+  const { id } = useParams()
 
   const { user, setUser } = useUserState(
     useShallow((state) => ({
       user: state.user,
       setUser: state.setUser,
     }))
-  );
+  )
 
   useEffect(() => {
     const initializeAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user || null);
-      setIsLoading(false);
-    };
+      const { data: { session }} = await supabase.auth.getSession()
+      setUser(session?.user || null)
+      setIsLoading(false)
+    }
 
-    initializeAuth();
+    initializeAuth()
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-      setIsLoading(false);
-    });
+      setUser(session?.user || null)
+      setIsLoading(false)
+    })
     
-    return () => subscription.unsubscribe();
-  }, [setUser]);
+    return () => subscription.unsubscribe()
+  }, [ setUser ])
 
   useEffect(() => {
     if (!isLoading && !user && id) {
-      navigate('/', { replace: true });
+      navigate('/', { replace: true })
     }
-  }, [user, id, navigate, isLoading]);
+  }, [ user, id, navigate, isLoading ])
 
   const handleDrawerToggle = () => {
-    setDrawerOpen(!drawerOpen);
-  };
+    setDrawerOpen(!drawerOpen)
+  }
 
 
   if (isLoading) {
@@ -78,18 +79,18 @@ export const App = () => {
       >
         <CircularProgress size={40} />
       </Box>
-    );
+    )
   }
 
   if (!user && !isLoading) {
-    return <Auth />;
+    return <Auth />
   }
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100dvh' }}>
       {isMobile && (
         <AppBar 
-          position="fixed" 
+          position='fixed' 
           sx={{ 
             zIndex: theme.zIndex.drawer + 1,
             backgroundColor: 'white',
@@ -99,9 +100,9 @@ export const App = () => {
         >
           <Toolbar>
             <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
+              color='inherit'
+              aria-label='open drawer'
+              edge='start'
               onClick={handleDrawerToggle}
               sx={{ mr: 2 }}
             >
@@ -112,7 +113,7 @@ export const App = () => {
       )}
 
       <Drawer
-        variant={isMobile ? "temporary" : "permanent"}
+        variant={isMobile ? 'temporary' : 'permanent'}
         open={isMobile ? drawerOpen : true}
         onClose={handleDrawerToggle}
         ModalProps={{
@@ -123,8 +124,8 @@ export const App = () => {
           flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: drawerWidth,
-            marginTop: isMobile ? '64px' : 0,
-            height: isMobile ? 'calc(100dvh - 64px)' : '100dvh',
+            marginTop: isMobile ? `${actionBarHeight}px` : 0,
+            height: isMobile ? `calc(100dvh - ${actionBarHeight}px)` : '100dvh',
             overflowY: 'auto',
             borderRight: '1px solid #e0e0e0',
           },
@@ -134,11 +135,11 @@ export const App = () => {
       </Drawer>
 
       <Box
-        component="main"
+        component='main'
         sx={{
           flexGrow: 1,
           p: 3,
-          marginTop: isMobile ? '64px' : 0,
+          marginTop: isMobile ? `${actionBarHeight}px` : 0,
           marginLeft: isMobile ? 0 : 0,
           minHeight: '100dvh',
           overflowY: 'auto',
@@ -147,5 +148,5 @@ export const App = () => {
         <Notes />
       </Box>
     </Box>
-  );
-};
+  )
+}

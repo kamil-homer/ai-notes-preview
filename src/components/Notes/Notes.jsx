@@ -5,22 +5,22 @@ import {
   InputAdornment,
   Tooltip,
   Typography,
-} from "@mui/material";
-import { Tiptap } from "../Tiptap/Tiptap";
-import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined';
-import { useNotesState } from "../../store/notesState";
-import { useParams } from "react-router";
-import { NoteButtons } from "../NoteButtons/NoteButtons";
+} from '@mui/material'
+import { Tiptap } from '../Tiptap/Tiptap'
+import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined'
+import { useNotesState } from '../../store/notesState'
+import { useParams } from 'react-router'
+import { NoteButtons } from '../NoteButtons/NoteButtons'
 
-import "./notes.css";
-import { useShallow } from "zustand/react/shallow";
-import { useEffect, useState } from "react";
-import { ai } from "../../services/ai-studio-client";
-import { generateTitlePrompt } from "../../prompts/prompts";
+import './notes.css'
+import { useShallow } from 'zustand/react/shallow'
+import { useEffect, useState } from 'react'
+import { ai } from '../../services/ai-studio-client'
+import { generateTitlePrompt } from '../../prompts/prompts'
 
 export const Notes = () => {
-  const { id } = useParams();
-  const [isGeneratingAiContent, setIsGeneratingAiContent] = useState(false);
+  const { id } = useParams()
+  const [ isGeneratingAiContent, setIsGeneratingAiContent ] = useState(false)
   const { notes, currentNoteTitle, setCurrentNoteTitle, currentNotePlainText } =
     useNotesState(
       useShallow((state) => ({
@@ -29,71 +29,71 @@ export const Notes = () => {
         setCurrentNoteTitle: state.setCurrentNoteTitle,
         currentNotePlainText: state.currentNotePlainText,
       }))
-    );
+    )
 
-  const selectedNote = id ? notes.find((note) => note.id == id) : null;
+  const selectedNote = id ? notes.find((note) => note.id == id) : null
   useEffect(() => {
     if (selectedNote) {
-      setCurrentNoteTitle(selectedNote.title);
+      setCurrentNoteTitle(selectedNote.title)
     }
-    return () => setCurrentNoteTitle("");
-  }, [selectedNote, setCurrentNoteTitle]);
+    return () => setCurrentNoteTitle('')
+  }, [ selectedNote, setCurrentNoteTitle ])
 
   const handleAiTitle = async () => {
-    setIsGeneratingAiContent(true);
-    let response;
+    setIsGeneratingAiContent(true)
+    let response
     try {
       response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: 'gemini-2.5-flash',
         contents: generateTitlePrompt(currentNotePlainText),
         config: {
           thinkingConfig: {
             thinkingBudget: 0, // Disables thinking
           },
         },
-      });
-      setCurrentNoteTitle(response.text);
+      })
+      setCurrentNoteTitle(response.text)
     } catch (error) {
-      console.log("Error generating AI title:", error);
+      console.log('Error generating AI title:', error)
     }
-    setIsGeneratingAiContent(false);
-  };
+    setIsGeneratingAiContent(false)
+  }
 
   const modificationDate = selectedNote
     ? new Date(selectedNote.updated_at).toLocaleDateString()
-    : new Date().toLocaleDateString();
+    : new Date().toLocaleDateString()
 
   return (
     <Box>
       <Box 
         sx={{ 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center", 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
           marginBottom: 2 
         }}
       >
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant='caption' color='text.secondary'>
           {modificationDate}
         </Typography>
         <NoteButtons />
       </Box>
       <Box sx={{ marginBottom: 3 }}>
         <Input
-          className="titleInput"
-          type="text"
-          placeholder="Podaj nowy tytuł"
+          className='titleInput'
+          type='text'
+          placeholder='Podaj nowy tytuł'
           fullWidth
           value={currentNoteTitle}
           onChange={(e) => setCurrentNoteTitle(e.target.value)}
           startAdornment={
-            <InputAdornment position="start">
-              <Tooltip title="Wygeneruj tytuł przez AI">
+            <InputAdornment position='start'>
+              <Tooltip title='Wygeneruj tytuł przez AI'>
                 <IconButton
                   onClick={handleAiTitle}
                   disabled={!currentNotePlainText || isGeneratingAiContent}
-                  size="small"
-                  color="primary"
+                  size='small'
+                  color='primary'
                 >
                   <AutoAwesomeOutlinedIcon />
                 </IconButton>
@@ -104,5 +104,5 @@ export const Notes = () => {
       </Box>
       <Tiptap />
     </Box>
-  );
-};
+  )
+}
