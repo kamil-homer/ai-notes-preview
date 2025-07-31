@@ -5,12 +5,16 @@ import {
   InputAdornment,
   Tooltip,
   Typography,
+  Divider,
 } from '@mui/material'
 import { Tiptap } from '../Tiptap/Tiptap'
 import AutoAwesomeOutlinedIcon from '@mui/icons-material/AutoAwesomeOutlined'
 import { useNotesState } from '../../store/notesState'
 import { useParams } from 'react-router'
 import { NoteButtons } from '../NoteButtons/NoteButtons'
+import { FileUpload } from '../FileUpload/FileUpload'
+import { fileService } from '../../services/file-service'
+import { useUserState } from '../../store/userState'
 
 import './notes.css'
 import { useShallow } from 'zustand/react/shallow'
@@ -21,6 +25,10 @@ import { generateTitlePrompt } from '../../prompts/prompts'
 export const Notes = () => {
   const { id } = useParams()
   const [ isGeneratingAiContent, setIsGeneratingAiContent ] = useState(false)
+  const [ files, setFiles ] = useState([])
+  
+  const { user } = useUserState(useShallow((state) => ({ user: state.user })))
+  
   const { notes, currentNoteTitle, setCurrentNoteTitle, currentNotePlainText } =
     useNotesState(
       useShallow((state) => ({
@@ -32,12 +40,31 @@ export const Notes = () => {
     )
 
   const selectedNote = id ? notes.find((note) => note.id == id) : null
+  
   useEffect(() => {
     if (selectedNote) {
       setCurrentNoteTitle(selectedNote.title)
     }
     return () => setCurrentNoteTitle('')
   }, [ selectedNote, setCurrentNoteTitle ])
+
+  // Załaduj pliki dla notatki
+  useEffect(() => {
+    if (id) {
+      loadFiles()
+    } else {
+      setFiles([])
+    }
+  }, [ id ])
+
+  const loadFiles = async () => {
+    try {
+      const noteFiles = await fileService.getFilesForNote(id)
+      setFiles(noteFiles)
+    } catch (error) {
+      console.error('Error loading files:', error)
+    }
+  }
 
   const handleAiTitle = async () => {
     setIsGeneratingAiContent(true)
@@ -102,7 +129,24 @@ export const Notes = () => {
           }
         />
       </Box>
+      
       <Tiptap />
+      
+      {/* Załączniki - tylko dla istniejących notatek */}
+      {id && (
+        <Box sx={{ mt: 3 }}>
+          <Divider sx={{ mb: 2 }} />
+          <Typography variant='h6' gutterBottom>
+            Załączniki
+          </Typography>
+          <FileUpload
+            noteId={id}
+            userId={user?.id}
+            files={files}
+            onFilesChange={setFiles}
+          />
+        </Box>
+      )}
     </Box>
   )
 }
