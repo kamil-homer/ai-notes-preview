@@ -14,11 +14,15 @@ import {
 import AttachFileIcon from '@mui/icons-material/AttachFile'
 import DeleteIcon from '@mui/icons-material/Delete'
 import DownloadIcon from '@mui/icons-material/Download'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 import { fileService } from '../../services/file-service'
+import { FilePreview } from '../FilePreview/FilePreview'
 
 export const FileUpload = ({ noteId, userId, files = [], onFilesChange }) => {
   const [ uploading, setUploading ] = useState(false)
   const [ error, setError ] = useState('')
+  const [ previewFile, setPreviewFile ] = useState(null)
+  const [ showPreview, setShowPreview ] = useState(false)
 
   const handleFileUpload = async (event) => {
     const file = event.target.files?.[0]
@@ -67,6 +71,16 @@ export const FileUpload = ({ noteId, userId, files = [], onFilesChange }) => {
     }
   }
 
+  const handleFilePreview = (file) => {
+    setPreviewFile(file)
+    setShowPreview(true)
+  }
+
+  const handleClosePreview = () => {
+    setShowPreview(false)
+    setPreviewFile(null)
+  }
+
   const formatFileSize = (bytes) => {
     if (bytes === 0) return '0 B'
     const k = 1024
@@ -111,6 +125,13 @@ export const FileUpload = ({ noteId, userId, files = [], onFilesChange }) => {
               <ListItemSecondaryAction>
                 <IconButton
                   size='small'
+                  onClick={() => handleFilePreview(file)}
+                  title='Podgląd pliku'
+                >
+                  <VisibilityIcon />
+                </IconButton>
+                <IconButton
+                  size='small'
                   onClick={() => handleFileDownload(file)}
                   title='Pobierz plik'
                 >
@@ -135,6 +156,13 @@ export const FileUpload = ({ noteId, userId, files = [], onFilesChange }) => {
           Brak załączników
         </Typography>
       )}
+
+      {/* Dialog podglądu pliku */}
+      <FilePreview
+        file={previewFile}
+        open={showPreview}
+        onClose={handleClosePreview}
+      />
     </Box>
   )
 }

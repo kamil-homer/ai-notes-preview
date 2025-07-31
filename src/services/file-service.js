@@ -9,12 +9,19 @@ export const fileService = {
       const fileName = `${Math.random()}.${fileExt}`
       const filePath = `${userId}/${fileName}`
 
+      console.log('Uploading file:', { fileName, filePath, size: file.size })
+
       // Upload do storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('notes-files')
         .upload(filePath, file)
 
-      if (uploadError) throw uploadError
+      if (uploadError) {
+        console.error('Storage upload error:', uploadError)
+        throw uploadError
+      }
+
+      console.log('File uploaded successfully:', uploadData)
 
       // Zapisz metadata w bazie (używamy camelCase)
       const { data: fileData, error: dbError } = await supabase
@@ -53,11 +60,17 @@ export const fileService = {
 
   // Pobierz URL do pobrania pliku
   async getFileUrl(filePath) {
-    const { data } = supabase.storage
-      .from('notes-files')
-      .getPublicUrl(filePath)
-    
-    return data.publicUrl
+    try {
+      const { data, error } = await supabase.storage
+        .from('notes-files')
+        .createSignedUrl(filePath, 60) // URL ważny przez 60 sekund
+      
+      if (error) throw error
+      return data.signedUrl
+    } catch (error) {
+      console.error('Error getting file URL:', error)
+      throw error
+    }
   },
 
   // Usuń plik
