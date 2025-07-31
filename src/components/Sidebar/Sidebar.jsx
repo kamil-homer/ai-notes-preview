@@ -214,15 +214,6 @@ export const Sidebar = ({ onItemClick }) => {
         startIcon={<LogoutIcon />}
         onClick={logOut}
         fullWidth
-        sx={{ 
-          textTransform: 'none',
-          borderColor: '#e0e0e0',
-          color: '#666',
-          '&:hover': {
-            borderColor: '#d32f2f',
-            backgroundColor: '#ffebee',
-          }
-        }}
       >
         Wyloguj
       </Button>
