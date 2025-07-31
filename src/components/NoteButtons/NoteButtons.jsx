@@ -42,7 +42,7 @@ const NoteButtonsComponent = () => {
   );
 
   const handleSave = async () => {
-    let noteTag = "";
+    let noteTag = "temp tag";
 
     const newEntry = {
       userId: user.id,
