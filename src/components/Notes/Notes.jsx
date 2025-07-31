@@ -147,6 +147,29 @@ export const Notes = () => {
           />
         </Box>
       )}
+
+      {/* Informacja dla nowych notatek */}
+      {!id && (
+        <Box sx={{ mt: 3 }}>
+          <Divider sx={{ mb: 2 }} />
+          <Typography variant='h6' gutterBottom>
+            Załączniki
+          </Typography>
+          <Box sx={{ 
+            p: 3, 
+            bgcolor: 'action.hover', 
+            borderRadius: 1,
+            textAlign: 'center'
+          }}>
+            <Typography variant='body2' color='text.secondary'>
+              Zapisz notatkę, aby móc dodawać pliki
+            </Typography>
+            <Typography variant='caption' color='text.secondary' sx={{ mt: 1, display: 'block' }}>
+              Upload plików dostępny jest po pierwszym zapisaniu notatki
+            </Typography>
+          </Box>
+        </Box>
+      )}
     </Box>
   )
 }

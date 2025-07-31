@@ -61,10 +61,7 @@ export const FileUpload = ({ noteId, userId, files = [], onFilesChange }) => {
   const handleFileDownload = async (file) => {
     try {
       const url = await fileService.getFileUrl(file.filePath)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = file.fileName
-      link.click()
+      window.open(url, '_blank')
     } catch (error) {
       setError('Błąd podczas pobierania pliku')
       console.error(error)
@@ -133,7 +130,7 @@ export const FileUpload = ({ noteId, userId, files = [], onFilesChange }) => {
                 <IconButton
                   size='small'
                   onClick={() => handleFileDownload(file)}
-                  title='Pobierz plik'
+                  title='Otwórz plik w nowej karcie'
                 >
                   <DownloadIcon />
                 </IconButton>
