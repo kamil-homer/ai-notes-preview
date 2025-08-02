@@ -9,6 +9,8 @@ import {
   Typography,
   Button,
   Divider,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import AddIcon from '@mui/icons-material/Add'
@@ -23,6 +25,8 @@ import { useUserState } from '../../store/userState'
 import { AppTitle } from '../AppTitle/AppTitle'
 
 export const Sidebar = ({ onItemClick }) => {
+  const theme = useTheme()
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'))
   const { id: currentNoteId } = useParams()
   const { user } = useUserState(
     useShallow((state) => ({
@@ -72,12 +76,14 @@ export const Sidebar = ({ onItemClick }) => {
         p: 2,
       }}
     >
-      <AppTitle 
-        variant='h5' 
-        sx={{ 
-          mb: 3
-        }} 
-      />
+      {!isMobile && (
+        <AppTitle 
+          variant='h5' 
+          sx={{ 
+            mb: 3
+          }} 
+        />
+      )}
 
       <Box 
         sx={{ 
