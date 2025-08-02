@@ -14,6 +14,7 @@ import '@fontsource/roboto/700-italic.css'
 import './index.css'
 
 import { App } from './App.jsx'
+import { ResetPassword } from './components/ResetPassword/ResetPassword'
 
 const theme = createTheme({
   breakpoints: {
@@ -34,6 +35,7 @@ createRoot(root).render(
       <CssBaseline />
       <BrowserRouter>
         <Routes>
+          <Route path='/reset-password' element={<ResetPassword />} />
           <Route path='/:id?' element={<App />} />
         </Routes>
       </BrowserRouter>
