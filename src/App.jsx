@@ -4,6 +4,7 @@ import {
   AppBar, 
   Toolbar, 
   IconButton, 
+  Typography,
   useMediaQuery,
   useTheme,
   CircularProgress
@@ -12,6 +13,7 @@ import MenuIcon from '@mui/icons-material/Menu'
 import { Sidebar } from './components/Sidebar/Sidebar'
 import { Notes } from './components/Notes/Notes'
 import { Auth } from './components/Auth/Auth'
+import { AppTitle } from './components/AppTitle/AppTitle'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { supabase } from './services/supabase-client'
@@ -108,6 +110,7 @@ export const App = () => {
             >
               <MenuIcon />
             </IconButton>
+            <AppTitle variant='h6' component='div' sx={{ textAlign: 'left' }} />
           </Toolbar>
         </AppBar>
       )}

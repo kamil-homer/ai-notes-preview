@@ -12,6 +12,7 @@ import {
   CircularProgress,
 } from '@mui/material'
 import { supabase } from '../../services/supabase-client'
+import { AppTitle } from '../AppTitle/AppTitle'
 
 export const Auth = () => {
   const [ isLogin, setIsLogin ] = useState(true)
@@ -122,9 +123,7 @@ export const Auth = () => {
     >
       <Card sx={{ maxWidth: 420, width: '100%' }}>
         <CardContent sx={{ p: 4 }}>
-          <Typography variant='h4' component='h1' gutterBottom sx={{ textAlign: 'center' }}>
-            AI Notes
-          </Typography>
+          <AppTitle gutterBottom />
 
           <Typography variant='body2' sx={{ textAlign: 'center', color: 'text.secondary', mb: 4 }}>
             Inteligentne notatki z pomocą AI

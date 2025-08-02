@@ -20,6 +20,7 @@ import { Link, useParams } from 'react-router'
 import { useShallow } from 'zustand/react/shallow'
 import { filterNotes, sortNotesByDate } from './sidebar-utils'
 import { useUserState } from '../../store/userState'
+import { AppTitle } from '../AppTitle/AppTitle'
 
 export const Sidebar = ({ onItemClick }) => {
   const { id: currentNoteId } = useParams()
@@ -71,6 +72,13 @@ export const Sidebar = ({ onItemClick }) => {
         p: 2,
       }}
     >
+      <AppTitle 
+        variant='h5' 
+        sx={{ 
+          mb: 3
+        }} 
+      />
+
       <Box 
         sx={{ 
           display: 'flex', 
