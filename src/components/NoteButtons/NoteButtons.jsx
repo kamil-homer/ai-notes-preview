@@ -1,21 +1,16 @@
 import {
   Box,
-  Button,
   CircularProgress,
   Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
   Tooltip,
   Typography,
 } from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete'
-import SaveIcon from '@mui/icons-material/Save'
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
 import InfoOutlineIcon from '@mui/icons-material/InfoOutlined'
-import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import { supabase } from '../../services/supabase-client'
 import { useNotesState } from '../../store/notesState'
 import { useUserState } from '../../store/userState'
@@ -31,8 +26,6 @@ const NoteButtonsComponent = () => {
 
   const [ isInfoDialogOpen, setIsInfoDialogOpen ] = useState(false)
   const [ isSaving, setIsSaving ] = useState(false)
-
-
 
   const { user } = useUserState(
     useShallow((state) => ({
@@ -62,25 +55,17 @@ const NoteButtonsComponent = () => {
     setIsSaving(true)
 
     try {
-      let noteTag = 'Ogólne' // fallback dla nowych notatek
+      let noteTag = 'Ogólne'
       
-      // Generuj tag tylko dla nowych notatek
       if (!id && currentNotePlainText && currentNotePlainText.trim().length > 10) {
         try {
-          const generatedTag = await generateAIContent(generateTagPrompt(currentNotePlainText))
-          
-          // Sprawdź czy wygenerowany tag jest sensowny (1-2 słowa, max 20 znaków)
-          if (generatedTag && generatedTag.length <= 20 && generatedTag.split(' ').length <= 2) {
-            noteTag = generatedTag
-          }
+          noteTag = await generateAIContent(generateTagPrompt(currentNotePlainText))
         } catch (aiError) {
           console.log('Błąd podczas generowania tagu:', aiError)
-          // Zostaw fallback tag
         }
       }
 
       if (!id) {
-        // Nowa notatka - użyj wygenerowanego tagu
         const newEntry = {
           userId: user.id,
           title: currentNoteTitle,
@@ -100,7 +85,6 @@ const NoteButtonsComponent = () => {
         }
         console.log(data, error)
       } else {
-        // Aktualizacja istniejącej notatki - bez zmiany tagu
         const updateEntry = {
           userId: user.id,
           title: currentNoteTitle,

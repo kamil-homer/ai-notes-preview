@@ -16,11 +16,12 @@ import { FileUpload } from '../FileUpload/FileUpload'
 import { fileService } from '../../services/file-service'
 import { useUserState } from '../../store/userState'
 
-import './notes.css'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useState } from 'react'
 import { generateAIContent } from '../../services/ai-studio-client'
 import { generateTitlePrompt } from '../../prompts/prompts'
+
+import './notes.css'
 
 export const Notes = () => {
   const { id } = useParams()
