@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 import { supabase } from './services/supabase-client'
 import { useUserState } from './store/userState'
+import { useNotesState } from './store/notesState'
 import { useShallow } from 'zustand/react/shallow'
 
 const drawerWidth = 280
@@ -35,6 +36,12 @@ export const App = () => {
     useShallow((state) => ({
       user: state.user,
       setUser: state.setUser,
+    }))
+  )
+
+  const { notes } = useNotesState(
+    useShallow((state) => ({
+      notes: state.notes,
     }))
   )
 
@@ -62,6 +69,16 @@ export const App = () => {
       navigate('/', { replace: true })
     }
   }, [ user, id, navigate, isLoading ])
+
+  // Sprawdź czy ID istnieje w notatkach (tylko gdy user zalogowany i notatki załadowane)
+  useEffect(() => {
+    if (!isLoading && user && id && notes.length > 0) {
+      const noteExists = notes.some((note) => note.id == id)
+      if (!noteExists) {
+        navigate('/', { replace: true })
+      }
+    }
+  }, [ user, id, notes, navigate, isLoading ])
 
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen)
