@@ -19,7 +19,7 @@ import { useUserState } from '../../store/userState'
 import './notes.css'
 import { useShallow } from 'zustand/react/shallow'
 import { useEffect, useState } from 'react'
-import { ai } from '../../services/ai-studio-client'
+import { generateAIContent } from '../../services/ai-studio-client'
 import { generateTitlePrompt } from '../../prompts/prompts'
 
 export const Notes = () => {
@@ -68,18 +68,9 @@ export const Notes = () => {
 
   const handleAiTitle = async () => {
     setIsGeneratingAiContent(true)
-    let response
     try {
-      response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: generateTitlePrompt(currentNotePlainText),
-        config: {
-          thinkingConfig: {
-            thinkingBudget: 0, // Disables thinking
-          },
-        },
-      })
-      setCurrentNoteTitle(response.text)
+      const aiTitle = await generateAIContent(generateTitlePrompt(currentNotePlainText))
+      setCurrentNoteTitle(aiTitle)
     } catch (error) {
       console.log('Error generating AI title:', error)
     }

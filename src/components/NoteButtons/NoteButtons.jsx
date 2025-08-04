@@ -1,19 +1,36 @@
-import { Box, Button, Dialog, DialogContent, DialogTitle, IconButton, Tooltip, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Tooltip,
+  Typography,
+} from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete'
+import SaveIcon from '@mui/icons-material/Save'
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined'
 import DeleteOutlinedIcon from '@mui/icons-material/DeleteOutlined'
-import InfoOutlineIcon from '@mui/icons-material/InfoOutline'
-import { useNotesState } from '../../store/notesState'
+import InfoOutlineIcon from '@mui/icons-material/InfoOutlined'
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'
 import { supabase } from '../../services/supabase-client'
-import { memo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router'
-import { useShallow } from 'zustand/react/shallow'
+import { useNotesState } from '../../store/notesState'
 import { useUserState } from '../../store/userState'
+import { useParams, useNavigate } from 'react-router'
+import { useShallow } from 'zustand/react/shallow'
+import { useState, memo } from 'react'
+import { generateAIContent } from '../../services/ai-studio-client'
+import { generateTagPrompt } from '../../prompts/prompts'
 
 const NoteButtonsComponent = () => {
   const navigation = useNavigate()
   const { id } = useParams()
 
   const [ isInfoDialogOpen, setIsInfoDialogOpen ] = useState(false)
+  const [ isSaving, setIsSaving ] = useState(false)
 
 
 
@@ -42,38 +59,70 @@ const NoteButtonsComponent = () => {
   )
 
   const handleSave = async () => {
-    let noteTag = 'temp tag'
+    setIsSaving(true)
 
-    const newEntry = {
-      userId: user.id,
-      title: currentNoteTitle,
-      content: currentNoteContent,
-      plainTextContent: currentNotePlainText,
-      tag: noteTag,
-      updated_at: new Date(),
-    }
+    try {
+      let noteTag = 'Ogólne' // fallback dla nowych notatek
+      
+      // Generuj tag tylko dla nowych notatek
+      if (!id && currentNotePlainText && currentNotePlainText.trim().length > 10) {
+        try {
+          const generatedTag = await generateAIContent(generateTagPrompt(currentNotePlainText))
+          
+          // Sprawdź czy wygenerowany tag jest sensowny (1-2 słowa, max 20 znaków)
+          if (generatedTag && generatedTag.length <= 20 && generatedTag.split(' ').length <= 2) {
+            noteTag = generatedTag
+          }
+        } catch (aiError) {
+          console.log('Błąd podczas generowania tagu:', aiError)
+          // Zostaw fallback tag
+        }
+      }
 
-    if (!id) {
-      const { data, error } = await supabase
-        .from('notes')
-        .insert([ newEntry ])
-        .single()
-        .select()
-      if (data) {
-        addNote(data)
-        navigation(`/${data.id}`)
+      if (!id) {
+        // Nowa notatka - użyj wygenerowanego tagu
+        const newEntry = {
+          userId: user.id,
+          title: currentNoteTitle,
+          content: currentNoteContent,
+          plainTextContent: currentNotePlainText,
+          tag: noteTag,
+          updated_at: new Date(),
+        }
+        const { data, error } = await supabase
+          .from('notes')
+          .insert([ newEntry ])
+          .single()
+          .select()
+        if (data) {
+          addNote(data)
+          navigation(`/${data.id}`)
+        }
+        console.log(data, error)
+      } else {
+        // Aktualizacja istniejącej notatki - bez zmiany tagu
+        const updateEntry = {
+          userId: user.id,
+          title: currentNoteTitle,
+          content: currentNoteContent,
+          plainTextContent: currentNotePlainText,
+          updated_at: new Date(),
+        }
+        
+        const { data, error } = await supabase
+          .from('notes')
+          .update(updateEntry)
+          .eq('id', id)
+          .select()
+        if (data) {
+          updateNote(data[0], id)
+        }
+        console.log(data, error)
       }
-      console.log(data, error)
-    } else {
-      const { data, error } = await supabase
-        .from('notes')
-        .update(newEntry)
-        .eq('id', id)
-        .select()
-      if (data) {
-        updateNote(data[0], id)
-      }
-      console.log(data, error)
+    } catch (error) {
+      console.error('Błąd podczas zapisywania notatki:', error)
+    } finally {
+      setIsSaving(false)
     }
   }
 
@@ -103,10 +152,14 @@ const NoteButtonsComponent = () => {
       <Tooltip title='Zapisz notatkę'>
         <IconButton
           onClick={handleSave}
-          disabled={!currentNoteContent || !currentNoteTitle}
+          disabled={!currentNoteContent || !currentNoteTitle || isSaving}
           color='primary'
         >
-          <SaveOutlinedIcon />
+          {isSaving ? (
+            <CircularProgress size={24} />
+          ) : (
+            <SaveOutlinedIcon />
+          )}
         </IconButton>
       </Tooltip>
       {id && (
