@@ -46,14 +46,6 @@ export const App = () => {
   )
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      const { data: { session }} = await supabase.auth.getSession()
-      setUser(session?.user || null)
-      setIsLoading(false)
-    }
-
-    initializeAuth()
-
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {

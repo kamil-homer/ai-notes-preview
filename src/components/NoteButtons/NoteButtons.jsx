@@ -97,9 +97,10 @@ const NoteButtonsComponent = () => {
           .from('notes')
           .update(updateEntry)
           .eq('id', id)
+          .single()
           .select()
         if (data) {
-          updateNote(data[0], id)
+          updateNote(data, id)
         }
         console.log(data, error)
       }
@@ -115,9 +116,10 @@ const NoteButtonsComponent = () => {
       .from('notes')
       .delete()
       .eq('id', id)
+      .single()
       .select()
     if (data) {
-      removeNote(data[0])
+      removeNote(data)
       navigation(`/`)
     }
     console.log(data, error)
